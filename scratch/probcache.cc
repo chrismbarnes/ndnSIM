@@ -37,6 +37,7 @@ main (int argc, char *argv[])
 {
 	LogComponentEnable ("ndn.Consumer", LOG_LEVEL_INFO);
 	LogComponentEnable ("ndn.Producer", LOG_LEVEL_INFO);
+	LogComponentEnable ("ndn.fw.Probcache", LOG_LEVEL_INFO);
 
 
   // setting default parameters for PointToPoint links and channels
@@ -59,6 +60,7 @@ main (int argc, char *argv[])
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
+  ndnHelper.SetForwardingStrategy("ns3::ndn::fw::Probcache");
   ndnHelper.SetDefaultRoutes (true);
   ndnHelper.InstallAll ();
 

@@ -232,7 +232,7 @@ public:
    * NEW: Get TSI field from interest header
    */
   uint8_t
-  GetTimeSinceInception ();
+  GetTimeSinceInception () const;
 
 
 

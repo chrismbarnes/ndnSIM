@@ -37,6 +37,7 @@ Interest::Interest (Ptr<Packet> payload/* = Create<Packet> ()*/)
   , m_nackType (NORMAL_INTEREST)
   , m_exclude (0)
   , m_payload (payload)
+  , m_timeSinceInception (0)
   , m_wire (0)
 {
   if (m_payload == 0) // just in case
@@ -53,6 +54,7 @@ Interest::Interest (const Interest &interest)
   , m_nackType         (interest.m_nackType)
   , m_exclude          (interest.m_exclude ? Create<Exclude> (*interest.GetExclude ()) : 0)
   , m_payload          (interest.GetPayload ()->Copy ())
+  , m_timeSinceInception (interest.m_timeSinceInception)
   , m_wire             (0)
 {
   NS_LOG_FUNCTION ("correct copy constructor");
@@ -171,7 +173,7 @@ Interest::SetTimeSinceInception (uint8_t tsi)
 }
 
 uint8_t
-Interest::GetTimeSinceInception ()
+Interest::GetTimeSinceInception () const
 {
 	return m_timeSinceInception;
 }

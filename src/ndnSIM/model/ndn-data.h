@@ -178,7 +178,7 @@ public:
    * NEW: Get TSI field from interest header
    */
   uint8_t
-  GetTimeSinceInception ();
+  GetTimeSinceInception () const;
 
   /**
    * NEW: Get TSI field from interest header
@@ -190,7 +190,7 @@ public:
    * NEW: Get TSI field from interest header
    */
   uint8_t
-  GetTimeSinceBirth ();
+  GetTimeSinceBirth () const;
 
   /**
    * @brief Print Interest in plain-text to the specified output stream

@@ -140,6 +140,12 @@ Producer::OnInterest (Ptr<const Interest> interest)
       data->SetKeyLocator (Create<Name> (m_keyLocator));
     }
 
+  uint8_t tsi = interest->GetTimeSinceInception();
+  data->SetTimeSinceInception(tsi);
+
+  NS_LOG_INFO ("Received Interest packet with TSI: " << std::to_string(interest->GetTimeSinceInception()));
+  NS_LOG_INFO ("Sending Data packet with TSI: " << std::to_string(data->GetTimeSinceInception()));
+  NS_LOG_INFO ("Sending Data packet with TSB: " << std::to_string(data->GetTimeSinceBirth()));
   NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with Data: " << data->GetName ());
 
   // Echo back FwHopCountTag if exists

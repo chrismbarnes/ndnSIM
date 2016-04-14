@@ -35,6 +35,8 @@ Data::Data (Ptr<Packet> payload/* = Create<Packet> ()*/)
   , m_signature (0)
   , m_payload (payload)
   , m_keyLocator (0)
+  , m_timeSinceBirth (0)
+  , m_timeSinceInception (0)
   , m_wire (0)
 {
   if (m_payload == 0) // just in case
@@ -49,6 +51,8 @@ Data::Data (const Data &other)
   , m_timestamp (other.GetTimestamp ())
   , m_signature (other.GetSignature ())
   , m_payload (other.GetPayload ()->Copy ())
+  , m_timeSinceBirth (other.GetTimeSinceBirth())
+  , m_timeSinceInception (other.GetTimeSinceInception())
   , m_wire (0)
 {
   if (other.GetKeyLocator ())
@@ -165,7 +169,7 @@ Data::SetTimeSinceInception (uint8_t tsi)
 }
 
 uint8_t
-Data::GetTimeSinceInception ()
+Data::GetTimeSinceInception () const
 {
 	return m_timeSinceInception;
 }
@@ -178,7 +182,7 @@ Data::SetTimeSinceBirth (uint8_t tsb)
 }
 
 uint8_t
-Data::GetTimeSinceBirth ()
+Data::GetTimeSinceBirth () const
 {
 	return m_timeSinceBirth;
 }
