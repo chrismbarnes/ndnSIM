@@ -136,20 +136,81 @@ void Probcache::OnInterest(Ptr<Face> inFace, Ptr<Interest> interest)
 	      DidForwardSimilarInterest (inFace, interest, pitEntry);
 	    }
 
+		uint8_t TSI = interest->GetTimeSinceInception();
+		interest->SetTimeSinceInception(TSI+1);
+		NS_LOG_INFO("Propagating Interest packet with TSI: " << std::to_string(interest->GetTimeSinceInception()));
+
 	  PropagateInterest (inFace, interest, pitEntry);
 }
 
-void Probcache::OnData(Ptr<Face> face, Ptr<Data> data){
+void Probcache::OnData(Ptr<Face> inFace, Ptr<Data> data){
+	NS_LOG_FUNCTION (inFace << data->GetName ());
+	m_inData (data, inFace);
 
+	uint8_t TSB = data->GetTimeSinceBirth();
+	data->SetTimeSinceBirth(TSB + 1);
+	NS_LOG_INFO ("Router: Received data packet with TSI: " << std::to_string(data->GetTimeSinceInception()));
+	NS_LOG_INFO ("Router: Received data packet and incremented TSB to: " << std::to_string(data->GetTimeSinceBirth()));
+
+	  // Lookup PIT entry
+	  Ptr<pit::Entry> pitEntry = m_pit->Lookup (*data);
+	  if (pitEntry == 0)
+	    {
+	      bool cached = false;
+
+	      if (m_cacheUnsolicitedData || (m_cacheUnsolicitedDataFromApps && (inFace->GetFlags () & Face::APPLICATION)))
+	        {
+	          // Optimistically add or update entry in the content store
+	          cached = m_contentStore->Add (data);
+	        }
+	      else
+	        {
+	          // Drop data packet if PIT entry is not found
+	          // (unsolicited data packets should not "poison" content store)
+
+	          //drop dulicated or not requested data packet
+	          m_dropData (data, inFace);
+	        }
+
+	      DidReceiveUnsolicitedData (inFace, data, cached);
+	      return;
+	    }
+	  else
+	    {
+		  /*
+		   * Probcache decision to cache based on TSB/TSI
+		   */
+		  bool cached = false;
+		  uint8_t tsi = data->GetTimeSinceInception();
+		  uint8_t tsb = data->GetTimeSinceBirth();
+		  double prob = (double)tsi / (double)tsb;
+		  double rand = ((double) std::rand() / (RAND_MAX));
+		  if (rand <= prob){
+		      cached = m_contentStore->Add (data);
+		      NS_LOG_INFO("Content was cached");
+		  } else{
+			  NS_LOG_INFO("Content was not cached");
+		  }
+
+		  DidReceiveSolicitedData (inFace, data, cached);
+	    }
+
+	  while (pitEntry != 0)
+	    {
+	      // Do data plane performance measurements
+	      WillSatisfyPendingInterest (inFace, pitEntry);
+
+	      // Actually satisfy pending interest
+	      SatisfyPendingInterest (inFace, data, pitEntry);
+
+	      // Lookup another PIT entry
+	      pitEntry = m_pit->Lookup (*data);
+	    }
 }
 
 bool Probcache::DoPropagateInterest(Ptr<Face> inFace, Ptr<const Interest> interest, Ptr<pit::Entry> pitEntry)
 {
 
-	uint8_t TSI = interest->GetTimeSinceInception();
-//	unsigned char tsi = 4;
-//	interest->SetTimeSinceInception(TSI+1);
-	NS_LOG_INFO("Propagating Interest packet with TSI: " << std::to_string(interest->GetTimeSinceInception()));
 
 	int propagatedCount = 0;
 

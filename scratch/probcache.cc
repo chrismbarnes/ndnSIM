@@ -51,12 +51,13 @@ main (int argc, char *argv[])
 
   // Creating nodes
   NodeContainer nodes;
-  nodes.Create (3);
+  nodes.Create (4);
 
   // Connecting nodes using two links
   PointToPointHelper p2p;
   p2p.Install (nodes.Get (0), nodes.Get (1));
   p2p.Install (nodes.Get (1), nodes.Get (2));
+  p2p.Install (nodes.Get (2), nodes.Get (3));
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
@@ -78,9 +79,9 @@ main (int argc, char *argv[])
   // Producer will reply to all requests starting with /prefix
   producerHelper.SetPrefix ("/prefix");
   producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
-  producerHelper.Install (nodes.Get (2)); // last node
+  producerHelper.Install (nodes.Get (3)); // last node
 
-  Simulator::Stop (Seconds (20.0));
+  Simulator::Stop (Seconds (1.0));
 
   Simulator::Run ();
   Simulator::Destroy ();

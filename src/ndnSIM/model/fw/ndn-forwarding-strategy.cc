@@ -217,7 +217,8 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
       DidForwardSimilarInterest (inFace, interest, pitEntry);
     }
 
-  PropagateInterest (inFace, interest, pitEntry);
+
+	PropagateInterest (inFace, interest, pitEntry);
 }
 
 void

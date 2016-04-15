@@ -37,7 +37,8 @@ protected:
 };
 
 }
-
+}
+} //end of namespaces
 
 
 #endif /* SRC_NDNSIM_MODEL_FW_PROBCACHE_H_ */
