@@ -164,6 +164,7 @@ def build(bld):
         "model/fw/ndn-forwarding-strategy.h",
         "model/fw/ndn-fw-tag.h",
         "model/fw/probcache.h",
+        "model/fw/betweeness.h",
 
         "model/wire/ndn-wire.h",
 

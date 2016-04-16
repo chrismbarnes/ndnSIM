@@ -37,6 +37,7 @@ Data::Data (Ptr<Packet> payload/* = Create<Packet> ()*/)
   , m_keyLocator (0)
   , m_timeSinceBirth (0)
   , m_timeSinceInception (0)
+  , m_maxBetweeness (0)
   , m_wire (0)
 {
   if (m_payload == 0) // just in case
@@ -53,6 +54,7 @@ Data::Data (const Data &other)
   , m_payload (other.GetPayload ()->Copy ())
   , m_timeSinceBirth (other.GetTimeSinceBirth())
   , m_timeSinceInception (other.GetTimeSinceInception())
+  , m_maxBetweeness (other.GetMaxBetweeness())
   , m_wire (0)
 {
   if (other.GetKeyLocator ())
@@ -185,6 +187,20 @@ uint8_t
 Data::GetTimeSinceBirth () const
 {
 	return m_timeSinceBirth;
+}
+
+void
+Data::SetMaxBetweeness (uint8_t maxBetweeness)
+{
+	m_maxBetweeness = maxBetweeness;
+	m_wire = 0;
+}
+
+
+uint8_t
+Data::GetMaxBetweeness () const
+{
+	  return m_maxBetweeness;
 }
 
 } // namespace ndn

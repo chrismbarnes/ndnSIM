@@ -38,13 +38,13 @@ Interest::Interest (Ptr<Packet> payload/* = Create<Packet> ()*/)
   , m_exclude (0)
   , m_payload (payload)
   , m_timeSinceInception (0)
+  , m_maxBetweeness (0)
   , m_wire (0)
 {
   if (m_payload == 0) // just in case
     {
       m_payload = Create<Packet> ();
     }
-  NS_LOG_INFO("WE ARE CALLING THE CONSTRUCTOR NOT THE COPY CONSTRUCTOR");
 }
 
 Interest::Interest (const Interest &interest)
@@ -56,6 +56,7 @@ Interest::Interest (const Interest &interest)
   , m_exclude          (interest.m_exclude ? Create<Exclude> (*interest.GetExclude ()) : 0)
   , m_payload          (interest.GetPayload ()->Copy ())
   , m_timeSinceInception (interest.m_timeSinceInception)
+  , m_maxBetweeness (interest.m_maxBetweeness)
   , m_wire             (0)
 {
   NS_LOG_FUNCTION ("correct copy constructor");
@@ -177,6 +178,20 @@ uint8_t
 Interest::GetTimeSinceInception () const
 {
 	return m_timeSinceInception;
+}
+
+void
+Interest::SetMaxBetweeness (uint8_t nodeBetweeness)
+{
+	if (nodeBetweeness > m_maxBetweeness){
+		m_maxBetweeness = nodeBetweeness;
+	}
+	m_wire = 0;
+}
+
+uint8_t
+Interest::GetMaxBetweeness () const{
+	return m_maxBetweeness;
 }
 
 void

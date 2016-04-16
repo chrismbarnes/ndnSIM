@@ -143,10 +143,15 @@ Producer::OnInterest (Ptr<const Interest> interest)
   uint8_t tsi = interest->GetTimeSinceInception();
   data->SetTimeSinceInception(tsi);
 
-  NS_LOG_INFO ("Received Interest packet with TSI: " << std::to_string(interest->GetTimeSinceInception()));
-  NS_LOG_INFO ("Sending Data packet with TSI: " << std::to_string(data->GetTimeSinceInception()));
-  NS_LOG_INFO ("Sending Data packet with TSB: " << std::to_string(data->GetTimeSinceBirth()));
-  NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with Data: " << data->GetName ());
+  uint8_t maxBetweeness = interest->GetMaxBetweeness();
+  data->SetMaxBetweeness(maxBetweeness);
+
+  NS_LOG_INFO ("Producer: Received Interest packet with TSI: " << std::to_string(interest->GetTimeSinceInception()));
+  NS_LOG_INFO ("Producer: Sending Data packet with TSI: " << std::to_string(data->GetTimeSinceInception()));
+  NS_LOG_INFO ("Producer: Sending Data packet with TSB: " << std::to_string(data->GetTimeSinceBirth()));
+  NS_LOG_INFO ("Producer: Sending Data packet with MaxBetweeness: " << std::to_string(data->GetMaxBetweeness()));
+  NS_LOG_INFO ("node("<< GetNode()->GetId() <<") responding with Data: " << data->GetName ());
+
 
   // Echo back FwHopCountTag if exists
   FwHopCountTag hopCountTag;

@@ -223,7 +223,7 @@ public:
   SetWire (Ptr<const Packet> packet) const;
 
   /**
-   * NEW: Get TSI field from interest header
+   * NEW: Set TSI field in interest header
    */
   void
   SetTimeSinceInception (uint8_t tsi);
@@ -234,7 +234,17 @@ public:
   uint8_t
   GetTimeSinceInception () const;
 
+  /*
+   * NEW: Set MaxBetweeness in interest header
+   */
+  void
+  SetMaxBetweeness (uint8_t nodeBetweeness);
 
+  /*
+   * NEW: Get MaxBetweeness from interest header
+   */
+  uint8_t
+  GetMaxBetweeness () const;
 
 
   /**
@@ -259,6 +269,7 @@ private:
   Ptr<Packet> m_payload;    ///< @brief virtual payload
 
   uint8_t m_timeSinceInception;	// New field added for probcache strategy
+  uint8_t m_maxBetweeness;	// New field added for betweeness centrality strategy
 
   mutable Ptr<const Packet> m_wire;
 };

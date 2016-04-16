@@ -103,7 +103,7 @@ Interest::GetSerializedSize (void) const
 {
   size_t size =
     1/*version*/ + 1 /*type*/ + 2/*length*/ +
-    (4/*nonce*/ + 1/*scope*/ + 1/*nack type*/ + 2/*timestamp*/ + 1/*TSI*/ +
+    (4/*nonce*/ + 1/*scope*/ + 1/*nack type*/ + 2/*timestamp*/ + 1/*TSI*/ + 1/*MaxB*/+
      NdnSim::SerializedSizeName (m_interest->GetName ()) +
 
      (2 +
@@ -128,6 +128,7 @@ Interest::Serialize (Buffer::Iterator start) const
   start.WriteU8 (m_interest->GetScope ());
   start.WriteU8 (m_interest->GetNack ());
   start.WriteU8 (m_interest->GetTimeSinceInception());
+  start.WriteU8 (m_interest->GetMaxBetweeness());
 
   NS_ASSERT_MSG (0 <= m_interest->GetInterestLifetime ().ToInteger (Time::S) && m_interest->GetInterestLifetime ().ToInteger (Time::S) < 65535,
                  "Incorrect InterestLifetime (should not be smaller than 0 and larger than 65535");
@@ -167,7 +168,13 @@ Interest::Deserialize (Buffer::Iterator start)
   m_interest->SetNonce (i.ReadU32 ());
   m_interest->SetScope (i.ReadU8 ());
   m_interest->SetNack (i.ReadU8 ());
+
+  /*
+   * New section for setting TSI and maxBetweeness from header
+   */
   m_interest->SetTimeSinceInception (i.ReadU8());
+  m_interest->SetMaxBetweeness(i.ReadU8());
+
 
   m_interest->SetInterestLifetime (Seconds (i.ReadU16 ()));
 
@@ -268,7 +275,7 @@ Data::FromWire (Ptr<Packet> packet)
 uint32_t
 Data::GetSerializedSize () const
 {
-  uint32_t size = 1 + 1 + 2 + 1/*TSI*/ + 1/*TSB*/+
+  uint32_t size = 1 + 1 + 2 + 1/*TSI*/ + 1/*TSB*/+ 1/*MaxB*/+
     ((2 + 2) +
      NdnSim::SerializedSizeName (m_data->GetName ()) +
      (2 + 2 + 4 + 2 + 2 + (2 + 0)));
@@ -291,6 +298,11 @@ Data::Serialize (Buffer::Iterator start) const
    */
   start.WriteU8 (m_data->GetTimeSinceInception());
   start.WriteU8 (m_data->GetTimeSinceBirth());
+
+  /*
+   * New section for serialized maxBetweeness
+   */
+  start.WriteU8 (m_data->GetMaxBetweeness());
 
   if (m_data->GetSignature () != 0)
     {
@@ -337,6 +349,11 @@ Data::Deserialize (Buffer::Iterator start)
    */
   m_data->SetTimeSinceInception(i.ReadU8());
   m_data->SetTimeSinceBirth(i.ReadU8());
+
+  /*
+   * New section for deserializing maxBetweeness field in Header
+   */
+  m_data->SetMaxBetweeness(i.ReadU8());
 
   uint32_t signatureLength = i.ReadU16 ();
   if (signatureLength == 6)

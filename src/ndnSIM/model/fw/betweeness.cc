@@ -1,13 +1,11 @@
 /*
- * probcache.cc
+ * betweeness.cc
  *
- *  Created on: Apr 14, 2016
- *      Author: Chris Barnes
- *
- *  Probache forwarding strategy implementation.
+ *  Created on: Apr 16, 2016
+ *      Author: chris
  */
 
-#include "probcache.h"
+#include "betweeness.h"
 
 #include "ns3/ndn-pit.h"
 #include "ns3/ndn-pit-entry.h"
@@ -32,33 +30,31 @@
 #include <boost/tuple/tuple.hpp>
 namespace ll = boost::lambda;
 
-NS_LOG_COMPONENT_DEFINE ("ndn.fw.Probcache");
+NS_LOG_COMPONENT_DEFINE ("ndn.fw.Betweeness");
 
 namespace ns3 {
 namespace ndn {
 namespace fw {
 
-NS_OBJECT_ENSURE_REGISTERED (Probcache);
+NS_OBJECT_ENSURE_REGISTERED (Betweeness);
 
-TypeId Probcache::GetTypeId ()
+TypeId Betweeness::GetTypeId ()
 {
-	static TypeId tid = TypeId ("ns3::ndn::fw::Probcache")
+	static TypeId tid = TypeId ("ns3::ndn::fw::Betweeness")
 	    .SetGroupName ("Ndn")
 	    .SetParent <ForwardingStrategy> ()
-		.AddConstructor <Probcache> ();
+		.AddConstructor <Betweeness> ();
 	return tid;
 }
 
-Probcache::Probcache ()
+Betweeness::Betweeness ()
 {
 
 }
 
-void Probcache::OnInterest(Ptr<Face> inFace, Ptr<Interest> interest)
+void Betweeness::OnInterest(Ptr<Face> inFace, Ptr<Interest> interest)
 {
-	uint32_t node_id = this->GetObject<Node>()->GetId();
-	NS_LOG_INFO("Received an Interest packet at Node: " << node_id);
-	NS_LOG_INFO("Betweeness at node " << node_id << " is " << this->GetObject<Node>()->GetBetweeness());
+
 
 	  m_inInterests (interest, inFace);
 
@@ -107,11 +103,11 @@ void Probcache::OnInterest(Ptr<Face> inFace, Ptr<Interest> interest)
 	      pitEntry->AddIncoming (inFace/*, Seconds (1.0)*/);
 
 	      /*
-	       * Transfer the TSI value from the Interest packet to the new Data packet
+	       * Transfer MaxBetweeness value to header of Data packet from interest packet
 	       */
-	      uint8_t tsi = interest->GetTimeSinceInception();
-	      contentObject->SetTimeSinceInception(tsi);
-	      NS_LOG_INFO("Cache hit, transferring TSI to Data packet with value: " << tsi);
+	      uint8_t maxBetweeness = interest->GetMaxBetweeness();
+	      contentObject->SetMaxBetweeness(maxBetweeness);
+	      NS_LOG_INFO("Cache hit, transferring MaxBetweeness to Data packet with value: " << maxBetweeness);
 
 	      // Do data plane performance measurements
 	      WillSatisfyPendingInterest (0, pitEntry);
@@ -140,16 +136,20 @@ void Probcache::OnInterest(Ptr<Face> inFace, Ptr<Interest> interest)
 	      DidForwardSimilarInterest (inFace, interest, pitEntry);
 	    }
 
-		uint8_t TSI = interest->GetTimeSinceInception();
-		NS_LOG_INFO("Received Interest packet with TSI: " << std::to_string(TSI));
+	  uint32_t node_id = this->GetObject<Node>()->GetId();
+	  uint8_t betweeness = this->GetObject<Node>()->GetBetweeness();
+	  NS_LOG_INFO("Received an Interest packet at Node: " << node_id);
+	  NS_LOG_INFO("Betweeness at node " << node_id << " is " << std::to_string(betweeness));
 
-		interest->SetTimeSinceInception(TSI+1);
-		NS_LOG_INFO("Propagating Interest packet with TSI: " << std::to_string(interest->GetTimeSinceInception()));
+	  NS_LOG_INFO("Betweeness of Interest before update: " << std::to_string(interest->GetMaxBetweeness()));
+
+	  interest->SetMaxBetweeness(betweeness);
+	  NS_LOG_INFO("MaxBetweeness of Interest packet is now: " << std::to_string(interest->GetMaxBetweeness()));
 
 	  PropagateInterest (inFace, interest, pitEntry);
 }
 
-void Probcache::OnData(Ptr<Face> inFace, Ptr<Data> data){
+void Betweeness::OnData(Ptr<Face> inFace, Ptr<Data> data){
 	NS_LOG_FUNCTION (inFace << data->GetName ());
 	m_inData (data, inFace);
 
@@ -157,10 +157,11 @@ void Probcache::OnData(Ptr<Face> inFace, Ptr<Data> data){
 	data->SetTimeSinceBirth(TSB + 1);
 
 	uint32_t node_id = this->GetObject<Node>()->GetId();
+	uint8_t betweeness = this->GetObject<Node>()->GetBetweeness();
+	uint8_t maxBetweeness = data->GetMaxBetweeness();
 
 	NS_LOG_INFO ("Received data packet at Node " << node_id);
-	NS_LOG_INFO ("Router: Received data packet with TSI: " << std::to_string(data->GetTimeSinceInception()));
-	NS_LOG_INFO ("Router: Received data packet and incremented TSB to: " << std::to_string(data->GetTimeSinceBirth()));
+	NS_LOG_INFO ("Router: Received data packet with MaxBetweeness: " << std::to_string(maxBetweeness));
 
 	  // Lookup PIT entry
 	  Ptr<pit::Entry> pitEntry = m_pit->Lookup (*data);
@@ -188,20 +189,12 @@ void Probcache::OnData(Ptr<Face> inFace, Ptr<Data> data){
 	  else
 	    {
 		  /*
-		   * Probcache decision to cache based on TSB/TSI
+		   * Betweeness centrality decision to cache
 		   */
 		  bool cached = false;
-		  uint8_t tsi = data->GetTimeSinceInception();
-		  uint8_t tsb = data->GetTimeSinceBirth();
-		  double prob = (double)tsb / (double)tsi;
-		  double rand = ((double) std::rand() / (RAND_MAX));
-
-		  NS_LOG_INFO("Trying make probcache decision...");
-		  NS_LOG_INFO("Probability: " << prob << "    Random number: " << rand);
-
-		  if (rand <= prob){
-		      cached = m_contentStore->Add (data);
-		      NS_LOG_INFO("Content was cached");
+		  if (betweeness == maxBetweeness){
+			  cached = m_contentStore->Add(data);
+			  NS_LOG_INFO("Content was cached");
 		  } else{
 			  NS_LOG_INFO("Content was not cached");
 		  }
@@ -222,10 +215,8 @@ void Probcache::OnData(Ptr<Face> inFace, Ptr<Data> data){
 	    }
 }
 
-bool Probcache::DoPropagateInterest(Ptr<Face> inFace, Ptr<const Interest> interest, Ptr<pit::Entry> pitEntry)
+bool Betweeness::DoPropagateInterest(Ptr<Face> inFace, Ptr<const Interest> interest, Ptr<pit::Entry> pitEntry)
 {
-
-	NS_LOG_INFO("Inside doPropagate, the TSI value is: " << std::to_string(interest->GetTimeSinceInception()));
 
 	int propagatedCount = 0;
 
@@ -249,4 +240,8 @@ bool Probcache::DoPropagateInterest(Ptr<Face> inFace, Ptr<const Interest> intere
 }
 
 }}} //end of namespaces
+
+
+
+
 

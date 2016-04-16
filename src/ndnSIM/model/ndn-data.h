@@ -169,28 +169,40 @@ public:
   SetWire (Ptr<const Packet> packet) const;
 
   /**
-   * NEW: Get TSI field from interest header
+   * NEW: Get TSI field from data header
    */
   void
   SetTimeSinceInception (uint8_t tsi);
 
   /**
-   * NEW: Get TSI field from interest header
+   * NEW: Get TSI field from data header
    */
   uint8_t
   GetTimeSinceInception () const;
 
   /**
-   * NEW: Get TSI field from interest header
+   * NEW: Get TSI field from data header
    */
   void
   SetTimeSinceBirth (uint8_t tsb);
 
   /**
-   * NEW: Get TSI field from interest header
+   * NEW: Get TSI field from data header
    */
   uint8_t
   GetTimeSinceBirth () const;
+
+  /*
+   * NEW: Set MaxBetweeness field for header
+   */
+  void
+  SetMaxBetweeness (uint8_t maxBetweeness);
+
+  /*
+   * NEW: Get MaxBetweeness field from header
+   */
+  uint8_t
+  GetMaxBetweeness () const;
 
   /**
    * @brief Print Interest in plain-text to the specified output stream
@@ -213,6 +225,7 @@ private:
 
   uint8_t m_timeSinceInception;	// New field added for probcache strategy
   uint8_t m_timeSinceBirth;	// New field added for probcache strategy
+  uint8_t m_maxBetweeness; // New field added for betweeness centrality strategy
 
   mutable Ptr<const Packet> m_wire;
 };

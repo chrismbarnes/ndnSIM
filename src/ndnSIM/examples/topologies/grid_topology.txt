@@ -1,0 +1,76 @@
+grid-topology - 12 nodes
+
+
+router
+
+# Node      MaxBetweeness	comment		yPos	xPos
+rtr_1		1				NA			2		2
+rtr_2		2				NA			2		3	
+rtr_3		2				NA			2		4					
+rtr_4		4				NA			2		5
+rtr_5		1				NA			3		2
+rtr_6		2				NA			3		3	
+rtr_7		2				NA			3		4
+rtr_8		3				NA			3		5
+rtr_9		3				NA			4		2
+rtr_10		2				NA			4		3
+rtr_11		3				NA			4		4
+rtr_12		3				NA			4		5
+cons_1		3				NA			1		3					
+cons_2		1				NA			1		4					
+cons_3		1				NA			1		5		
+cons_4		4				NA			3		5
+cons_5		2				NA			4		3
+cons_6		2				NA			4		4
+cons_7		1				NA			4		5
+prod_1		3				NA			2		1
+prod_2		2				NA			3		1
+prod_3		2				NA			4		1
+
+
+link
+
+# srcNode   dstNode     bandwidth   metric  delay   queue
+rtr_1       rtr_2      1Mbps       1       10ms    10
+rtr_1       rtr_5       1Mbps       1       10ms    10
+rtr_1       prod_1      1Mbps       1       10ms    10
+rtr_2       rtr_1       1Mbps       1       10ms    10
+rtr_2       rtr_3       1Mbps       1       10ms    10
+rtr_2       rtr_6       1Mbps       1       10ms    10
+rtr_3       rtr_2       1Mbps       1       10ms    10
+rtr_3       rtr_4       1Mbps       1       10ms    10
+rtr_3       rtr_7       1Mbps       1       10ms    10
+rtr_4       rtr_3       1Mbps       1       10ms    10
+rtr_4       rtr_8       1Mbps       1       10ms    10
+rtr_5       rtr_1       1Mbps       1       10ms    10
+rtr_5       rtr_6       1Mbps       1       10ms    10
+rtr_5       prod_2      1Mbps       1       10ms    10
+rtr_6       rtr_5       1Mbps       1       10ms    10
+rtr_6       rtr_2       1Mbps       1       10ms    10
+rtr_6       rtr_7       1Mbps       1       10ms    10
+rtr_7       rtr_6       1Mbps       1       10ms    10
+rtr_7       rtr_3       1Mbps       1       10ms    10
+rtr_7       rtr_8       1Mbps       1       10ms    10
+rtr_8       rtr_4       1Mbps       1       10ms    10
+rtr_8       rtr_7       1Mbps       1       10ms    10
+rtr_9       rtr_5       1Mbps       1       10ms    10
+rtr_9       rtr_10      1Mbps       1       10ms    10
+rtr_9       prod_3      1Mbps       1       10ms    10
+rtr_10      rtr_6       1Mbps       1       10ms    10
+rtr_10      rtr_9       1Mbps       1       10ms    10
+rtr_10      rtr_11      1Mbps       1       10ms    10
+rtr_11      rtr_7       1Mbps       1       10ms    10
+rtr_11      rtr_10      1Mbps       1       10ms    10
+rtr_11      rtr_12      1Mbps       1       10ms    10
+rtr_12      rtr_8       1Mbps       1       10ms    10
+rtr_12      rtr_11      1Mbps       1       10ms    10
+rtr_2		cons_1		1Mbps       1       10ms    10
+rtr_3		cons_2		1Mbps       1       10ms    10
+rtr_4		cons_3		1Mbps       1       10ms    10
+rtr_8		cons_4		1Mbps       1       10ms    10
+rtr_10		cons_5		1Mbps       1       10ms    10
+rtr_11		cons_6		1Mbps       1       10ms    10
+rtr_12		cons_7		1Mbps       1       10ms    10
+
+
+
