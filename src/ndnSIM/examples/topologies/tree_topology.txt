@@ -1,0 +1,80 @@
+Tree Topology: 4-Level
+Total Number of Nodes: 15
+
+router
+#Node      			MaxBetweeness
+
+rtr_1			
+rtr_2					1
+rtr_3					2
+rtr_4					0	
+rtr_5					2
+rtr_6					1
+rtr_7					1
+rtr_8					2
+rtr_9					4
+rtr_10				3	
+rtr_11				2
+rtr_12				2
+rtr_13				1
+rtr_14				2
+rtr_15				1
+cons_1				2
+cons_2				2
+cons_3				3
+cons_4				1
+cons_5				2
+cons_6				2
+cons_7				3
+cons_8				1
+cons_9				1
+cons_10				2
+cons_11				3
+cons_12				2
+cons_13				2
+cons_14				4
+cons_15				3
+cons_16				2
+prod_1				0
+prod_2				0
+
+
+link
+
+# From			To			 Bandwidth			Metric			Delay			Queue
+
+rtr_1				rtr_2		 	100Mbps      			1		        	10ms		    	10
+rtr_1				rtr_3		 	100Mbps      			1		        	10ms		    	10
+rtr_2				rtr_4		 	100Mbps      			1		        	10ms		    	10
+rtr_2				rtr_5		 	100Mbps      			1		        	10ms		    	10
+rtr_3				rtr_6		 	100Mbps      			1		        	10ms		    	10
+rtr_3				rtr_7		 	100Mbps      			1		        	10ms		    	10
+rtr_4				rtr_8		 	100Mbps      			1		        	10ms		    	10
+rtr_4				rtr_9		 	100Mbps      			1		        	10ms		    	10
+rtr_5				rtr_10		100Mbps      			1		        	10ms		    	10
+rtr_5				rtr_11		100Mbps      			1		        	10ms		    	10
+rtr_6				rtr_12		100Mbps      			1		        	10ms		    	10
+rtr_6				rtr_13		100Mbps      			1		        	10ms		    	10
+rtr_7				rtr_14		100Mbps      			1		        	10ms		    	10
+rtr_7				rtr_15		100Mbps      			1		        	10ms		    	10
+rtr_8				cons_1		100Mbps      			1		        	10ms		    	10
+rtr_8				cons_2		100Mbps      			1		        	10ms		    	10	
+rtr_9				cons_3		100Mbps      			1		        	10ms		    	10
+rtr_9				cons_4		100Mbps      			1		        	10ms		    	10
+rtr_10			cons_5		100Mbps      			1		        	10ms		    	10
+rtr_10			cons_6		100Mbps      			1		        	10ms		    	10
+rtr_11			cons_7		100Mbps      			1		        	10ms		    	10
+rtr_11			cons_8		100Mbps      			1		        	10ms		    	10
+rtr_12			cons_9		100Mbps      			1		        	10ms		    	10
+rtr_12			cons_10		100Mbps      			1		        	10ms		    	10		
+rtr_13			cons_11		100Mbps      			1		        	10ms		    	10
+rtr_13			cons_12		100Mbps      			1		        	10ms		    	10
+rtr_14			cons_13		100Mbps      			1		        	10ms		    	10
+rtr_14			cons_14		100Mbps      			1		        	10ms		    	10
+rtr_15			cons_15		100Mbps      			1		        	10ms		    	10
+rtr_15			cons_16		100Mbps      			1		        	10ms		    	10
+prod_1			rtr_1		100Mbps      			1		        	10ms		    	10
+prod_2			rtr_1		100Mbps      			1		        	10ms		    	10
+
+
+
