@@ -463,6 +463,7 @@ ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
   /// @todo Make lifetime per incoming interface
   pitEntry->UpdateLifetime (interest->GetInterestLifetime ());
 
+  NS_LOG_INFO("TSI of Packet before propagation: " << std::to_string(interest->GetTimeSinceInception()));
   bool propagated = DoPropagateInterest (inFace, interest, pitEntry);
 
   if (!propagated && isRetransmitted) //give another chance if retransmitted
@@ -533,6 +534,7 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
 
   pitEntry->AddOutgoing (outFace);
 
+  NS_LOG_INFO("Sending out Interest packet with TSI: " << std::to_string(interest->GetTimeSinceInception()));
   //transmission
   bool successSend = outFace->SendInterest (interest);
   if (!successSend)

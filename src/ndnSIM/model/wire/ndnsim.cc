@@ -103,7 +103,7 @@ Interest::GetSerializedSize (void) const
 {
   size_t size =
     1/*version*/ + 1 /*type*/ + 2/*length*/ +
-    (4/*nonce*/ + 1/*scope*/ + 1/*nack type*/ + 2/*timestamp*/ +
+    (4/*nonce*/ + 1/*scope*/ + 1/*nack type*/ + 2/*timestamp*/ + 1/*TSI*/ +
      NdnSim::SerializedSizeName (m_interest->GetName ()) +
 
      (2 +
@@ -127,6 +127,7 @@ Interest::Serialize (Buffer::Iterator start) const
   start.WriteU32 (m_interest->GetNonce ());
   start.WriteU8 (m_interest->GetScope ());
   start.WriteU8 (m_interest->GetNack ());
+  start.WriteU8 (m_interest->GetTimeSinceInception());
 
   NS_ASSERT_MSG (0 <= m_interest->GetInterestLifetime ().ToInteger (Time::S) && m_interest->GetInterestLifetime ().ToInteger (Time::S) < 65535,
                  "Incorrect InterestLifetime (should not be smaller than 0 and larger than 65535");
@@ -166,6 +167,7 @@ Interest::Deserialize (Buffer::Iterator start)
   m_interest->SetNonce (i.ReadU32 ());
   m_interest->SetScope (i.ReadU8 ());
   m_interest->SetNack (i.ReadU8 ());
+  m_interest->SetTimeSinceInception (i.ReadU8());
 
   m_interest->SetInterestLifetime (Seconds (i.ReadU16 ()));
 
@@ -266,7 +268,7 @@ Data::FromWire (Ptr<Packet> packet)
 uint32_t
 Data::GetSerializedSize () const
 {
-  uint32_t size = 1 + 1 + 2 +
+  uint32_t size = 1 + 1 + 2 + 1/*TSI*/ + 1/*TSB*/+
     ((2 + 2) +
      NdnSim::SerializedSizeName (m_data->GetName ()) +
      (2 + 2 + 4 + 2 + 2 + (2 + 0)));
@@ -284,6 +286,12 @@ Data::Serialize (Buffer::Iterator start) const
   start.WriteU8 (0x01); // packet type
   start.WriteU16 (GetSerializedSize () - 4); // length
   
+  /*
+   * New section for serialized TSI and TSB
+   */
+  start.WriteU8 (m_data->GetTimeSinceInception());
+  start.WriteU8 (m_data->GetTimeSinceBirth());
+
   if (m_data->GetSignature () != 0)
     {
       start.WriteU16 (6); // signature length
@@ -323,6 +331,12 @@ Data::Deserialize (Buffer::Iterator start)
     throw new DataException ();
 
   i.ReadU16 (); // length
+
+  /*
+   * New section for deserializing TSI and TSB fields in Header
+   */
+  m_data->SetTimeSinceInception(i.ReadU8());
+  m_data->SetTimeSinceBirth(i.ReadU8());
 
   uint32_t signatureLength = i.ReadU16 ();
   if (signatureLength == 6)

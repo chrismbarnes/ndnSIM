@@ -125,6 +125,16 @@ public:
    */
   uint32_t GetNApplications (void) const;
 
+  /*
+   * Returns the betweeness set for this node
+   */
+  uint32_t GetBetweeness();
+
+  /*
+   * Sets the betweeness of the node
+   */
+  void SetBetweeness(uint32_t);
+
   /**
    * A protocol handler
    *
@@ -277,6 +287,11 @@ private:
   std::vector<Ptr<Application> > m_applications; //!< Applications associated to this node
   ProtocolHandlerList m_handlers; //!< Protocol handlers in the node
   DeviceAdditionListenerList m_deviceAdditionListeners; //!< Device addition listeners in the node
+
+  /*
+   * New attribute added for betweeness centrality
+   */
+  uint32_t m_betweeness;
 };
 
 } // namespace ns3

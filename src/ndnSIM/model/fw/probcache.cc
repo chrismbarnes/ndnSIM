@@ -56,6 +56,10 @@ Probcache::Probcache ()
 
 void Probcache::OnInterest(Ptr<Face> inFace, Ptr<Interest> interest)
 {
+	uint32_t node_id = this->GetObject<Node>()->GetId();
+	NS_LOG_INFO("Received an Interest packet at Node: " << node_id);
+	NS_LOG_INFO("Betweeness at node " << node_id << " is " << this->GetObject<Node>()->GetBetweeness());
+
 	  m_inInterests (interest, inFace);
 
 	  Ptr<pit::Entry> pitEntry = m_pit->Lookup (*interest);
@@ -137,6 +141,8 @@ void Probcache::OnInterest(Ptr<Face> inFace, Ptr<Interest> interest)
 	    }
 
 		uint8_t TSI = interest->GetTimeSinceInception();
+		NS_LOG_INFO("Received Interest packet with TSI: " << std::to_string(TSI));
+
 		interest->SetTimeSinceInception(TSI+1);
 		NS_LOG_INFO("Propagating Interest packet with TSI: " << std::to_string(interest->GetTimeSinceInception()));
 
@@ -149,6 +155,10 @@ void Probcache::OnData(Ptr<Face> inFace, Ptr<Data> data){
 
 	uint8_t TSB = data->GetTimeSinceBirth();
 	data->SetTimeSinceBirth(TSB + 1);
+
+	uint32_t node_id = this->GetObject<Node>()->GetId();
+
+	NS_LOG_INFO ("Received data packet at Node " << node_id);
 	NS_LOG_INFO ("Router: Received data packet with TSI: " << std::to_string(data->GetTimeSinceInception()));
 	NS_LOG_INFO ("Router: Received data packet and incremented TSB to: " << std::to_string(data->GetTimeSinceBirth()));
 
@@ -211,6 +221,7 @@ void Probcache::OnData(Ptr<Face> inFace, Ptr<Data> data){
 bool Probcache::DoPropagateInterest(Ptr<Face> inFace, Ptr<const Interest> interest, Ptr<pit::Entry> pitEntry)
 {
 
+	NS_LOG_INFO("Inside doPropagate, the TSI value is: " << std::to_string(interest->GetTimeSinceInception()));
 
 	int propagatedCount = 0;
 

@@ -38,6 +38,10 @@ main (int argc, char *argv[])
 	LogComponentEnable ("ndn.Consumer", LOG_LEVEL_INFO);
 	LogComponentEnable ("ndn.Producer", LOG_LEVEL_INFO);
 	LogComponentEnable ("ndn.fw.Probcache", LOG_LEVEL_INFO);
+	LogComponentEnable ("ndn.fw", LOG_LEVEL_INFO);
+	LogComponentEnable ("ndn.Interest", LOG_LEVEL_INFO);
+	LogComponentEnable ("ndn.wire.ndnSIM", LOG_LEVEL_INFO);
+//	LogComponentEnable ("Node", LOG_LEVEL_INFO);
 
 
   // setting default parameters for PointToPoint links and channels
@@ -64,6 +68,15 @@ main (int argc, char *argv[])
   ndnHelper.SetForwardingStrategy("ns3::ndn::fw::Probcache");
   ndnHelper.SetDefaultRoutes (true);
   ndnHelper.InstallAll ();
+
+  // Print betweeness (test)
+  nodes.Get (0)->SetBetweeness(0);
+  nodes.Get (1)->SetBetweeness(4);
+  nodes.Get (2)->SetBetweeness(4);
+  nodes.Get (3)->SetBetweeness(0);
+
+  uint32_t betweeness = nodes.Get(1)->GetBetweeness();
+
 
   // Installing applications
 

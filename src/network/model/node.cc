@@ -171,6 +171,20 @@ Node::GetNApplications (void) const
   return m_applications.size ();
 }
 
+uint32_t
+Node::GetBetweeness()
+{
+	NS_LOG_INFO("Returning betweeness for node " << m_id << " as " << m_betweeness);
+	return m_betweeness;
+}
+
+void
+Node::SetBetweeness(uint32_t betw)
+{
+	m_betweeness = betw;
+	NS_LOG_INFO("Set betweeness for node " << m_id << " to " << m_betweeness);
+}
+
 void 
 Node::DoDispose ()
 {

@@ -44,6 +44,7 @@ Interest::Interest (Ptr<Packet> payload/* = Create<Packet> ()*/)
     {
       m_payload = Create<Packet> ();
     }
+  NS_LOG_INFO("WE ARE CALLING THE CONSTRUCTOR NOT THE COPY CONSTRUCTOR");
 }
 
 Interest::Interest (const Interest &interest)
@@ -169,7 +170,7 @@ void
 Interest::SetTimeSinceInception (uint8_t tsi)
 {
 	m_timeSinceInception = tsi;
-	m_wire = 0; //Why does this have to go here?
+	m_wire = 0;
 }
 
 uint8_t
