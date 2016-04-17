@@ -58,7 +58,6 @@ void Probcache::OnInterest(Ptr<Face> inFace, Ptr<Interest> interest)
 {
 	uint32_t node_id = this->GetObject<Node>()->GetId();
 	NS_LOG_INFO("Received an Interest packet at Node: " << node_id);
-	NS_LOG_INFO("Betweeness at node " << node_id << " is " << this->GetObject<Node>()->GetBetweeness());
 
 	  m_inInterests (interest, inFace);
 
@@ -111,7 +110,7 @@ void Probcache::OnInterest(Ptr<Face> inFace, Ptr<Interest> interest)
 	       */
 	      uint8_t tsi = interest->GetTimeSinceInception();
 	      contentObject->SetTimeSinceInception(tsi);
-	      NS_LOG_INFO("Cache hit, transferring TSI to Data packet with value: " << tsi);
+	      NS_LOG_INFO("Cache hit, transferring TSI to Data packet with value: " << std::to_string(tsi));
 
 	      // Do data plane performance measurements
 	      WillSatisfyPendingInterest (0, pitEntry);
@@ -224,9 +223,6 @@ void Probcache::OnData(Ptr<Face> inFace, Ptr<Data> data){
 
 bool Probcache::DoPropagateInterest(Ptr<Face> inFace, Ptr<const Interest> interest, Ptr<pit::Entry> pitEntry)
 {
-
-	NS_LOG_INFO("Inside doPropagate, the TSI value is: " << std::to_string(interest->GetTimeSinceInception()));
-
 	int propagatedCount = 0;
 
 	  BOOST_FOREACH (const fib::FaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<fib::i_metric> ())

@@ -192,7 +192,16 @@ AnnotatedTopologyReader::Read (void)
           node = CreateNode (name, var.GetValue (), var.GetValue (), systemId);
           // node = CreateNode (name, systemId);
         }
+
+      /*
+       * New section added to hijack the city attribute and use it for max betweeness
+       *
+       * city = betweeness in this case
+       */
+      node->SetBetweeness(std::stoi(city));
     }
+
+
 
   map<string, set<string> > processedLinks; // to eliminate duplications
 

@@ -37,8 +37,9 @@ main (int argc, char *argv[])
 {
 	LogComponentEnable ("ndn.Consumer", LOG_LEVEL_INFO);
 	LogComponentEnable ("ndn.Producer", LOG_LEVEL_INFO);
-//	LogComponentEnable ("ndn.fw.Probcache", LOG_LEVEL_INFO);
-//	LogComponentEnable ("ndn.fw", LOG_LEVEL_INFO);
+	LogComponentEnable ("ndn.fw.Probcache", LOG_LEVEL_INFO);
+	LogComponentEnable ("ndn.fw", LOG_LEVEL_INFO);
+//	LogComponentEnable ("ndn.cs.ContentStore", LOG_LEVEL_INFO);
 //	LogComponentEnable ("ndn.Interest", LOG_LEVEL_INFO);
 //	LogComponentEnable ("ndn.wire.ndnSIM", LOG_LEVEL_INFO);
 //	LogComponentEnable ("Node", LOG_LEVEL_INFO);
@@ -76,16 +77,15 @@ main (int argc, char *argv[])
   nodes.Get (2)->SetBetweeness(4);
   nodes.Get (3)->SetBetweeness(0);
 
-  uint32_t betweeness = nodes.Get(1)->GetBetweeness();
-
 
   // Installing applications
 
   // Consumer
-  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
+  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerZipfMandelbrot");
   // Consumer will request /prefix/0, /prefix/1, ...
   consumerHelper.SetPrefix ("/prefix");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
+  consumerHelper.SetAttribute ("Frequency", StringValue ("100")); // 10 interests a second
+  consumerHelper.SetAttribute ("NumberOfContents", StringValue ("100"));
   consumerHelper.Install (nodes.Get (0)); // first node
 
   // Producer
@@ -95,7 +95,11 @@ main (int argc, char *argv[])
   producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
   producerHelper.Install (nodes.Get (3)); // last node
 
-  Simulator::Stop (Seconds (1.0));
+  Simulator::Stop (Seconds (4.0));
+
+  ndn::L3AggregateTracer::InstallAll("test-aggregate-trace.txt", Seconds(1.0));
+  ndn::AppDelayTracer::InstallAll("test-app-delay-trace.txt");
+  ndn::CsTracer::InstallAll("test-cs-trace.txt", Seconds(1.0));
 
   Simulator::Run ();
   Simulator::Destroy ();

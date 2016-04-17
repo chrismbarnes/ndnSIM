@@ -54,6 +54,7 @@ main (int argc, char *argv[])
 	LogComponentEnable ("ndn.Consumer", LOG_LEVEL_INFO);
 	LogComponentEnable ("ndn.Producer", LOG_LEVEL_INFO);
 	LogComponentEnable ("ndn.fw.Probcache", LOG_LEVEL_INFO);
+	LogComponentEnable ("ndn.fw.Betweeness", LOG_LEVEL_INFO);
 
   CommandLine cmd;
   cmd.Parse (argc, argv);
@@ -64,7 +65,7 @@ main (int argc, char *argv[])
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Probcache");
+  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Betweeness");
   ndnHelper.InstallAll ();
 
   // Installing global routing interface on all nodes
