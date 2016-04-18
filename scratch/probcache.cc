@@ -49,10 +49,11 @@ main (int argc, char *argv[])
 //	LogComponentEnable ("AnnotatedTopologyReader", LOG_LEVEL_INFO);
 
 	// Default parameters
-	std::string frequency = "100";
-	std::string cachesize = "10";
+	std::string frequency = "60";
+	std::string cachesize = "15";
 	std::string protocol = "Betweeness";
 	std::string mandelbrot = "0.5";
+	std::string contents = "100";
 
 	// setting default parameters for PointToPoint links and channels
 	Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
@@ -65,60 +66,57 @@ main (int argc, char *argv[])
 	cmd.AddValue("cachesize", "Cache size on each node", cachesize);
 	cmd.AddValue("protocol", "Sets the forwarding strategy", protocol);
 	cmd.AddValue("mandelbrot", "Sets the s value for the zipf mandelbrooooo", mandelbrot);
+	cmd.AddValue("contents", "Sets number of contents available at producer", contents);
 	cmd.Parse (argc, argv);
 
 	std::cout << "Running with frequency: " << frequency << std::endl;
 	std::cout << "Running with cachesize: " << cachesize << std::endl;
 	std::cout << "Running with protocol: " << protocol << std::endl;
 	std::cout << "Running with mandelBROOOOOO!!!: " << mandelbrot << std::endl;
+	std::cout << "Running with number of contents: " << contents << std::endl;
+
 
 	// Use topology builder to build tree network topology
     AnnotatedTopologyReader topologyReader ("", 10);
 	topologyReader.SetFileName ("src/ndnSIM/examples/topologies/tree_topology.txt");
 	topologyReader.Read ();
 
-	 // Install stack on all nodes
-	ndn::StackHelper ndnHelper;
+	NodeContainer consumerNodes = topologyReader.GetConsumerNodes();
+	NodeContainer producerNodes = topologyReader.GetProducerNodes();
+	NodeContainer routerNodes = topologyReader.GetRouterNodes();
+
+	 // Install caching stack on router nodes
+	ndn::StackHelper ndnRouterHelper;
 	if (protocol == "Betweeness"){
-	  ndnHelper.SetForwardingStrategy("ns3::ndn::fw::Betweeness");
+	  ndnRouterHelper.SetForwardingStrategy("ns3::ndn::fw::Betweeness");
 	} else if (protocol == "Probcache") {
-	  ndnHelper.SetForwardingStrategy("ns3::ndn::fw::Probcache");
+	  ndnRouterHelper.SetForwardingStrategy("ns3::ndn::fw::Probcache");
 	}
-	ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", cachesize);
-	ndnHelper.InstallAll ();
+	ndnRouterHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", cachesize);
+	ndnRouterHelper.Install(routerNodes);
+
+	// Install noncaching stack on consumer and producer nodes
+	ndn::StackHelper ndnNocacheHelper;
+	if (protocol == "Betweeness"){
+		ndnNocacheHelper.SetForwardingStrategy("ns3::ndn::fw::Betweeness");
+	} else if (protocol == "Probcache") {
+		ndnNocacheHelper.SetForwardingStrategy("ns3::ndn::fw::Probcache");
+	}
+	ndnNocacheHelper.SetContentStore ("ns3::ndn::cs::Nocache");
+	ndnNocacheHelper.Install(consumerNodes);
+	ndnNocacheHelper.Install(producerNodes);
 
 	// Installing global routing interface on all nodes
 	ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
 	ndnGlobalRoutingHelper.InstallAll ();
 
-	// Getting containers for the consumer/producer
-	NodeContainer consumerNodes;
-	consumerNodes.Add (Names::Find<Node> ("cons_1"));
-	consumerNodes.Add (Names::Find<Node> ("cons_2"));
-	consumerNodes.Add (Names::Find<Node> ("cons_3"));
-	consumerNodes.Add (Names::Find<Node> ("cons_4"));
-	consumerNodes.Add (Names::Find<Node> ("cons_5"));
-	consumerNodes.Add (Names::Find<Node> ("cons_6"));
-	consumerNodes.Add (Names::Find<Node> ("cons_7"));
-	consumerNodes.Add (Names::Find<Node> ("cons_8"));
-	consumerNodes.Add (Names::Find<Node> ("cons_9"));
-	consumerNodes.Add (Names::Find<Node> ("cons_10"));
-	consumerNodes.Add (Names::Find<Node> ("cons_11"));
-	consumerNodes.Add (Names::Find<Node> ("cons_12"));
-	consumerNodes.Add (Names::Find<Node> ("cons_13"));
-	consumerNodes.Add (Names::Find<Node> ("cons_14"));
-	consumerNodes.Add (Names::Find<Node> ("cons_15"));
-	consumerNodes.Add (Names::Find<Node> ("cons_16"));
-
-	Ptr<Node> producer1 = Names::Find<Node> ("prod_1");
-	//     Ptr<Node> producer2 = Names::Find<Node> ("prod_2");
-
 	// Consumer setup
 	ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerZipfMandelbrot");
 	consumerHelper.SetPrefix ("/prefix");
 	consumerHelper.SetAttribute ("Frequency", StringValue (frequency)); // 10 interests a second
-	consumerHelper.SetAttribute ("NumberOfContents", StringValue ("100"));
+	consumerHelper.SetAttribute ("NumberOfContents", StringValue (contents));
 	consumerHelper.SetAttribute ("s", StringValue (mandelbrot));
+	consumerHelper.SetAttribute ("q", StringValue ("0.0"));
 	consumerHelper.SetAttribute ("Randomize", StringValue ("uniform"));
 	consumerHelper.Install (consumerNodes);
 
@@ -126,13 +124,13 @@ main (int argc, char *argv[])
 	ndn::AppHelper producerHelper ("ns3::ndn::Producer");
 	producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
 	producerHelper.SetPrefix ("/prefix");
-	producerHelper.Install (producer1);
+	producerHelper.Install (producerNodes);
 
 	// Add origins, calculate and install FIBs
-	ndnGlobalRoutingHelper.AddOrigins ("/prefix", producer1);
+	ndnGlobalRoutingHelper.AddOrigins ("/prefix", producerNodes);
 	ndn::GlobalRoutingHelper::CalculateRoutes ();
 
-	Simulator::Stop (Seconds (10.0));
+	Simulator::Stop (Seconds (600.0));
 
 	/*
 	* Tracer setup

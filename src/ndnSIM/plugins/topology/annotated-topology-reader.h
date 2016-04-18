@@ -115,6 +115,18 @@ public:
   virtual void
   SaveGraphviz (const std::string &file);
   
+  /*
+   * NEW: Getters for consumer/producer and router node containers
+   */
+  NodeContainer
+  GetConsumerNodes();
+
+  NodeContainer
+  GetProducerNodes();
+
+  NodeContainer
+  GetRouterNodes();
+
 protected:
   Ptr<Node>
   CreateNode (const std::string name, uint32_t systemId);
@@ -145,6 +157,13 @@ private:
   double m_scale;
 
   uint32_t m_requiredPartitions;
+
+  /*
+   * New attributes for node containers of routers and consumers/producers
+   */
+  NodeContainer m_consumers;
+  NodeContainer m_producers;
+  NodeContainer m_routers;
 };
 
 }

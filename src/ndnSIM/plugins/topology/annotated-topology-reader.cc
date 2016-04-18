@@ -193,6 +193,17 @@ AnnotatedTopologyReader::Read (void)
         {
           UniformVariable var (0,200);
           node = CreateNode (name, var.GetValue (), var.GetValue (), systemId);
+
+          /*
+           * New section added for distinguishing between consumer/producer and router nodes
+           */
+          if (name.find("cons") == 0){
+        	  m_consumers.Add(node);
+          } else if (name.find("prod") == 0){
+        	  m_producers.Add(node);
+          } else {
+        	  m_routers.Add(node);
+          }
           // node = CreateNode (name, systemId);
         }
 
@@ -524,6 +535,23 @@ AnnotatedTopologyReader::SaveTopology (const std::string &file)
     }
 }
 
+/*
+ * NEW: Getters for consumer/producer and router node containers
+ */
+NodeContainer
+AnnotatedTopologyReader::GetConsumerNodes(){
+	  return m_consumers;
+}
+
+NodeContainer
+AnnotatedTopologyReader::GetProducerNodes(){
+	  return m_producers;
+}
+
+NodeContainer
+AnnotatedTopologyReader::GetRouterNodes(){
+	  return m_routers;
+}
 
 template <class Names>
 class name_writer {
