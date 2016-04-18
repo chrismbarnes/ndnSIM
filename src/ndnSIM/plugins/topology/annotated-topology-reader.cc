@@ -53,6 +53,9 @@
 #include <boost/graph/graphviz.hpp>
 
 #include <set>
+#include <typeinfo>
+#include <string>
+
 
 #ifdef NS3_MPI
 #include <ns3/mpi-interface.h>
@@ -198,7 +201,9 @@ AnnotatedTopologyReader::Read (void)
        *
        * city = betweeness in this case
        */
-      node->SetBetweeness(std::stoi(city));
+
+      node->SetBetweeness(std::atoi(city.c_str()));
+
     }
 
 
